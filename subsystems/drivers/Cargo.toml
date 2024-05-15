@@ -19,7 +19,7 @@ shim = { path = "../shim", features = ["lib"] }
 
 
 spin = "0"
-virtio-drivers = { git = "https://github.com/rcore-os/virtio-drivers",rev = "de1c3b1" }
+virtio-drivers = { git = "https://github.com/muxinyu1/virtio-drivers", rev = "7fca8ba" }
 rtc = { git = "https://github.com/os-module/rtc.git" }
 lru = "0"
 

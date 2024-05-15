@@ -8,3 +8,4 @@ pub mod input;
 pub mod net;
 pub mod rtc;
 pub mod uart;
+pub mod sound;

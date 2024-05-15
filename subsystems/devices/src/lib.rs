@@ -7,6 +7,7 @@ mod net;
 mod prob;
 mod rtc;
 mod uart;
+mod sound;
 
 extern crate alloc;
 

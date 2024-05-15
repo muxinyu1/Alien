@@ -1,6 +1,9 @@
 #![no_std]
 
+extern crate alloc;
+
 use core::any::Any;
+use alloc::vec::Vec;
 
 use constants::{io::RtcTime, AlienResult};
 
@@ -47,6 +50,31 @@ pub trait UartDevice: DeviceBase {
     fn put_bytes(&self, bytes: &[u8]);
     fn have_data_to_get(&self) -> bool;
     fn have_space_to_put(&self) -> bool;
+}
+
+pub trait SoundDevice: DeviceBase {
+    fn jack_remap(&self, jack_id: u32, association: u32, sequence: u32) -> bool;
+    fn pcm_set_params(
+        &mut self,
+        stream_id: u32,
+        buffer_bytes: u32,
+        period_bytes: u32,
+        features: u32,
+        channels: u8,
+        format: u64,
+        rate: u64,
+    ) -> bool;
+    fn pcm_prepare(&self, stream_id: u32) -> bool;
+    fn pcm_release(&self, stream_id: u32) -> bool;
+    fn pcm_start(&self, stream_id: u32) -> bool;
+    fn pcm_stop(&self, stream_id: u32) -> bool;
+    fn pcm_xfer(&self, stream_id: u32, frames: &[u8]) -> bool;
+    fn pcm_xfer_nb(&self, stream_id: u32, frames: &[u8]) -> AlienResult<u16>;
+    fn pcm_xfer_ok(&self, token: u16) -> bool;
+    fn output_streams(&self) -> Vec<u32>;
+    fn input_streams(&self) -> Vec<u32>;
+    fn rates_supported(&self, stream_id: u32) -> AlienResult<u64>;
+    // TODO
 }
 
 pub trait NetDevice: DeviceBase {}
