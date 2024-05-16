@@ -42,7 +42,7 @@ impl SoundDevice for VirtIOSoundWrapper {
     }
 
     fn pcm_set_params(
-        &mut self,
+        &self,
         stream_id: u32,
         buffer_bytes: u32,
         period_bytes: u32,
@@ -125,6 +125,27 @@ impl SoundDevice for VirtIOSoundWrapper {
     fn rates_supported(&self, stream_id: u32) -> constants::AlienResult<u64> {
         match self.sound.lock().rates_supported(stream_id) {
             Ok(rate) => Ok(rate.bits()),
+            Err(_) => Err(AlienError::EIO),
+        }
+    }
+    
+    fn formats_supported(&self, stream_id: u32) -> AlienResult<u64> {
+        match self.sound.lock().formats_supported(stream_id) {
+            Ok(formats) => Ok(formats.bits()),
+            Err(_) => Err(AlienError::EIO),
+        }
+    }
+    
+    fn channel_range_supported(&self, stream_id: u32) -> AlienResult<core::ops::RangeInclusive<u8>> {
+        match self.sound.lock().channel_range_supported(stream_id) {
+            Ok(range) => Ok(range),
+            Err(_) => Err(AlienError::EIO)
+        }
+    }
+    
+    fn features_supported(&self, stream_id: u32) -> AlienResult<u32> {
+        match self.sound.lock().features_supported(stream_id) {
+            Ok(features) => Ok(features.bits()),
             Err(_) => Err(AlienError::EIO),
         }
     }

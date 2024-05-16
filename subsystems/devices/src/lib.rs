@@ -11,12 +11,12 @@ mod sound;
 
 extern crate alloc;
 
-use alloc::{boxed::Box, sync::Arc, vec::Vec};
-use core::ptr::NonNull;
+use alloc::{boxed::Box, rc::Rc, sync::Arc, vec::Vec};
+use core::{borrow::Borrow, ptr::NonNull};
 
 pub use block::{BLKDevice, BLOCK_DEVICE};
 use config::MAX_INPUT_EVENT_NUM;
-use device_interface::{DeviceBase, GpuDevice, LowBlockDevice};
+use device_interface::{DeviceBase, GpuDevice, LowBlockDevice, SoundDevice};
 use drivers::{
     block_device::GenericBlockDevice,
     rtc::GoldFishRtc,
@@ -24,16 +24,17 @@ use drivers::{
 };
 use fdt::Fdt;
 pub use gpu::{GPUDevice, GPU_DEVICE};
+pub use sound::{SOUNDDevice, SOUND_DEVICE};
 pub use input::{INPUTDevice, KEYBOARD_INPUT_DEVICE, MOUSE_INPUT_DEVICE};
 use interrupt::register_device_to_plic;
 use log::info;
 use platform::println;
 pub use rtc::{RTCDevice, RTC_DEVICE};
 pub use uart::{UARTDevice, UART_DEVICE};
-use virtio_drivers::transport::{
+use virtio_drivers::{device::sound::{PcmFeatures, PcmFormats, PcmRate}, transport::{
     mmio::{MmioTransport, VirtIOHeader},
     DeviceType, Transport,
-};
+}};
 
 use crate::prob::Probe;
 
@@ -174,6 +175,7 @@ pub fn init_virtio_mmio(devices: Vec<prob::DeviceInfo>) {
                     DeviceType::Block => init_block_device(device, Some(transport)),
                     DeviceType::GPU => init_gpu(device, Some(transport)),
                     DeviceType::Network => init_net(Some(device)),
+                    DeviceType::Sound => init_sound(device, Some(transport)),
                     ty => {
                         println!("Don't support virtio device type: {:?}", ty);
                     }
@@ -354,4 +356,70 @@ fn init_loop_device() {
     let loopback = Box::new(LoopbackDev::new());
     netcore::init_net(loopback, Arc::new(NetNeedFunc), ip, gate_way, false);
     println!("Init net device success");
+}
+
+fn init_sound(sound: prob::DeviceInfo, mmio_transport: Option<MmioTransport>) {
+    let (base_addr, irq) = (sound.base_addr, sound.irq);
+    println!("Init sound, base_addr:{:#x},irq:{}", base_addr, irq);
+    match sound.compatible.as_str() {
+        "virtio,mmio" => {
+            // qemu
+            use drivers::sound::VirtIOSoundWrapper;
+            let sound = VirtIOSoundWrapper::from_mmio(mmio_transport.unwrap());
+            let sound_driver: Arc<dyn SoundDevice> = Arc::new(sound);
+            play_music(sound_driver.clone());
+            sound::init_sound(sound_driver.clone());
+            // let _ = register_device_to_plic(irq, gpu);
+            println!("Init sound success");
+        }
+        name => {
+            println!("Don't support sound: {}", name);
+        }
+    }
+}
+
+fn play_music(sound: Arc<dyn SoundDevice>) {
+    let output_streams = sound.output_streams();
+    if output_streams.len() > 0 {
+        let output_stream_id = *output_streams.first().unwrap();
+        let rates = PcmRate::from(sound.rates_supported(output_stream_id).unwrap());
+        let formats = PcmFormats::from(sound.formats_supported(output_stream_id).unwrap());
+        let channel_range = sound.channel_range_supported(output_stream_id).unwrap();
+        let features = PcmFeatures::from(sound.features_supported(output_stream_id).unwrap());
+
+        let rate = if rates.contains(PcmRate::VIRTIO_SND_PCM_RATE_44100) {
+            PcmRate::VIRTIO_SND_PCM_RATE_44100
+        } else {
+            PcmRate::VIRTIO_SND_PCM_RATE_32000
+        };
+        let format = if formats.contains(PcmFormats::VIRTIO_SND_PCM_FMT_U8) {
+            PcmFormats::VIRTIO_SND_PCM_FMT_U8
+        } else {
+            PcmFormats::VIRTIO_SND_PCM_FMT_U32
+        };
+        let channel = if channel_range.contains(&2) {
+            2 as u8
+        } else {
+            *channel_range.start()
+        };
+        sound
+            .pcm_set_params(
+                output_stream_id,
+                4410 * 2,
+                4410,
+                features.bits(),
+                channel,
+                format.bits(),
+                rate.bits(),
+            );
+        sound
+            .pcm_prepare(output_stream_id);
+        sound.pcm_start(output_stream_id);
+        let music = include_bytes!("../Nocturne_44100Hz_u8_stereo.raw");
+        info!("[sound device] music len is {} bytes.", music.len());
+        // xfer buffer
+        sound.pcm_xfer(output_stream_id, &music[..]);
+        sound.pcm_stop(output_stream_id);
+        sound.pcm_release(output_stream_id);
+    }
 }

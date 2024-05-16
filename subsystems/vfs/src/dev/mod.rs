@@ -3,8 +3,8 @@ use alloc::{collections::BTreeMap, sync::Arc};
 use constants::DeviceId;
 use devfs::DevKernelProvider;
 use devices::{
-    BLKDevice, GPUDevice, INPUTDevice, RTCDevice, UARTDevice, BLOCK_DEVICE, GPU_DEVICE,
-    KEYBOARD_INPUT_DEVICE, MOUSE_INPUT_DEVICE, RTC_DEVICE, UART_DEVICE,
+    BLKDevice, GPUDevice, INPUTDevice, RTCDevice, SOUNDDevice, UARTDevice, BLOCK_DEVICE,
+    GPU_DEVICE, KEYBOARD_INPUT_DEVICE, MOUSE_INPUT_DEVICE, RTC_DEVICE, SOUND_DEVICE, UART_DEVICE,
 };
 use ksync::Mutex;
 use log::info;
@@ -251,5 +251,19 @@ fn scan_system_devices(root: Arc<dyn VfsInode>) {
         .unwrap();
         info!("uart device id: {}", uart_device.device_id().id());
         register_device(uart_device);
+    });
+    SOUND_DEVICE.get().map(|sound| {
+        let sound_device = Arc::new(SOUNDDevice::new(
+            alloc_device_id(VfsNodeType::CharDevice),
+            sound.clone(),
+        ));
+        root.create(
+            "sound",
+            VfsNodeType::BlockDevice,
+            "rw-rw----".into(),
+            Some(sound_device.device_id().id()),
+        ).unwrap();
+        info!("sound device id: {}", sound_device.device_id().id());
+        register_device(sound_device);
     });
 }

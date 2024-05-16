@@ -9,6 +9,10 @@ use vfscore::utils::VfsFileStat;
 
 pub static SOUND_DEVICE: Once<Arc<dyn SoundDevice>> = Once::new();
 
+pub fn init_sound(sound: Arc<dyn SoundDevice>) {
+    SOUND_DEVICE.call_once(|| sound);
+}
+
 pub struct SOUNDDevice {
     device_id: DeviceId,
     device: Arc<dyn SoundDevice>

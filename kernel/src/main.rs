@@ -13,6 +13,7 @@ extern crate alloc;
 extern crate unwinder;
 use alloc::boxed::Box;
 
+use devices::SOUND_DEVICE;
 pub use syscall_table::*;
 mod fs;
 mod gui;

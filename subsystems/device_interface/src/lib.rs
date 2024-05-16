@@ -2,7 +2,7 @@
 
 extern crate alloc;
 
-use core::any::Any;
+use core::{any::Any, ops::RangeInclusive};
 use alloc::vec::Vec;
 
 use constants::{io::RtcTime, AlienResult};
@@ -55,7 +55,7 @@ pub trait UartDevice: DeviceBase {
 pub trait SoundDevice: DeviceBase {
     fn jack_remap(&self, jack_id: u32, association: u32, sequence: u32) -> bool;
     fn pcm_set_params(
-        &mut self,
+        &self,
         stream_id: u32,
         buffer_bytes: u32,
         period_bytes: u32,
@@ -74,7 +74,9 @@ pub trait SoundDevice: DeviceBase {
     fn output_streams(&self) -> Vec<u32>;
     fn input_streams(&self) -> Vec<u32>;
     fn rates_supported(&self, stream_id: u32) -> AlienResult<u64>;
-    // TODO
+    fn formats_supported(&self, stream_id: u32) -> AlienResult<u64>;
+    fn channel_range_supported(&self, stream_id: u32) -> AlienResult<RangeInclusive<u8>>;
+    fn features_supported(&self, stream_id: u32) -> AlienResult<u32>;
 }
 
 pub trait NetDevice: DeviceBase {}

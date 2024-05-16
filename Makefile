@@ -43,6 +43,10 @@ else
 QEMU_ARGS += -nographic
 endif
 
+ifeq ($(SOUND),y)
+QEMU_ARGS += -device virtio-sound-device,audiodev=audio0 \
+			 -audiodev alsa,id=audio0
+endif
 
 ifeq ($(VF2),y)
 FEATURES += vf2 ramdisk
