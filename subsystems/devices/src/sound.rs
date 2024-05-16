@@ -3,9 +3,9 @@ use constants::DeviceId;
 use device_interface::SoundDevice;
 use spin::Once;
 use vfscore::{file::VfsFile, inode::VfsInode, utils::VfsNodeType};
-
-
-
+use vfscore::inode::InodeAttr;
+use vfscore::VfsResult;
+use vfscore::utils::VfsFileStat;
 
 pub static SOUND_DEVICE: Once<Arc<dyn SoundDevice>> = Once::new();
 

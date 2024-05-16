@@ -29,9 +29,9 @@ uart8250 = { git = "https://github.com/os-module/uart-rs.git" }
 
 
 # net
-loopback = { git = "https://github.com/os-module/simple-net" }
-virtio-net = { git = "https://github.com/os-module/simple-net" }
-netcore = { git = "https://github.com/os-module/simple-net" }
+loopback = { git = "https://github.com/muxinyu1/simple-net" }
+virtio-net = { git = "https://github.com/muxinyu1/simple-net" }
+netcore = { git = "https://github.com/muxinyu1/simple-net" }
 
 visionfive2-sd = { git = "https://github.com/os-module/visionfive2-sd.git" }
 

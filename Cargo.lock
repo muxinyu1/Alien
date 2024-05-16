@@ -703,13 +703,13 @@ dependencies = [
  "interrupt",
  "ksync",
  "log",
- "netcore",
+ "netcore 0.1.0 (git+https://github.com/muxinyu1/simple-net)",
  "platform",
  "shim",
  "smoltcp",
  "spin",
  "vfscore",
- "virtio-drivers 0.5.0 (git+https://github.com/rcore-os/virtio-drivers?rev=de1c3b1)",
+ "virtio-drivers 0.7.2",
 ]
 
 [[package]]
@@ -755,7 +755,7 @@ dependencies = [
  "loopback",
  "lru",
  "mem",
- "netcore",
+ "netcore 0.1.0 (git+https://github.com/muxinyu1/simple-net)",
  "platform",
  "rtc",
  "shim",
@@ -1503,7 +1503,7 @@ dependencies = [
  "ksync",
  "log",
  "mem",
- "netcore",
+ "netcore 0.1.0 (git+https://github.com/os-module/simple-net)",
  "page-table",
  "platform",
  "riscv",
@@ -1534,7 +1534,7 @@ dependencies = [
  "constants",
  "ksync",
  "log",
- "netcore",
+ "netcore 0.1.0 (git+https://github.com/os-module/simple-net)",
  "vfs",
  "vfscore",
 ]
@@ -1699,9 +1699,9 @@ checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
 [[package]]
 name = "loopback"
 version = "0.1.0"
-source = "git+https://github.com/os-module/simple-net#9201deb305a2f93c9914af0d4742d580a9ce9b37"
+source = "git+https://github.com/muxinyu1/simple-net#ad2698e92fefc992404cfebb81c0b0d629ce0b8f"
 dependencies = [
- "netcore",
+ "netcore 0.1.0 (git+https://github.com/muxinyu1/simple-net)",
 ]
 
 [[package]]
@@ -1955,6 +1955,19 @@ dependencies = [
 [[package]]
 name = "netcore"
 version = "0.1.0"
+source = "git+https://github.com/muxinyu1/simple-net#ad2698e92fefc992404cfebb81c0b0d629ce0b8f"
+dependencies = [
+ "kernel-sync",
+ "log",
+ "preprint",
+ "smoltcp",
+ "spin",
+ "virtio-drivers 0.7.2",
+]
+
+[[package]]
+name = "netcore"
+version = "0.1.0"
 source = "git+https://github.com/os-module/simple-net#9201deb305a2f93c9914af0d4742d580a9ce9b37"
 dependencies = [
  "kernel-sync",
@@ -1962,7 +1975,7 @@ dependencies = [
  "preprint",
  "smoltcp",
  "spin",
- "virtio-drivers 0.5.0 (git+https://github.com/rcore-os/virtio-drivers?rev=de1c3b130e507702f13d142b9bee55670a4a2858)",
+ "virtio-drivers 0.5.0",
 ]
 
 [[package]]
@@ -3547,16 +3560,6 @@ dependencies = [
 [[package]]
 name = "virtio-drivers"
 version = "0.5.0"
-source = "git+https://github.com/rcore-os/virtio-drivers?rev=de1c3b1#de1c3b130e507702f13d142b9bee55670a4a2858"
-dependencies = [
- "bitflags 2.4.2",
- "log",
- "zerocopy 0.6.6",
-]
-
-[[package]]
-name = "virtio-drivers"
-version = "0.5.0"
 source = "git+https://github.com/rcore-os/virtio-drivers?rev=de1c3b130e507702f13d142b9bee55670a4a2858#de1c3b130e507702f13d142b9bee55670a4a2858"
 dependencies = [
  "bitflags 2.4.2",
@@ -3583,10 +3586,10 @@ source = "git+https://github.com/os-module/virtio-input-decoder.git#10c726892cb2
 [[package]]
 name = "virtio-net"
 version = "0.1.0"
-source = "git+https://github.com/os-module/simple-net#9201deb305a2f93c9914af0d4742d580a9ce9b37"
+source = "git+https://github.com/muxinyu1/simple-net#ad2698e92fefc992404cfebb81c0b0d629ce0b8f"
 dependencies = [
- "netcore",
- "virtio-drivers 0.5.0 (git+https://github.com/rcore-os/virtio-drivers?rev=de1c3b1)",
+ "netcore 0.1.0 (git+https://github.com/muxinyu1/simple-net)",
+ "virtio-drivers 0.7.2",
 ]
 
 [[package]]
